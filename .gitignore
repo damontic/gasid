@@ -1,4 +1,7 @@
 output/*
 tmp/*
 pickles/*
-*/*~
+*~
+bin/python/__pycache__/
+*.dot
+*.svg
