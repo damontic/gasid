@@ -38,11 +38,11 @@ class Gasid(object):
                         os.mkdir(DIRECTORY_PICKLES)
 
                 connection = boto.connect_ec2()
-                instances = self.get_instances()
+                instances = self.get_instances(connection)
 
                 return self.create_image(file_dot = self.create_dot_file(instances))
 
-        def get_instances(self):
+        def get_instances(self, connection):
                 """
                 Returns the instances from AWS and stores them in the pickles directory.
                 If the pickles directory and the FILE_INSTANCES file already exist then
