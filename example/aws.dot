@@ -1,0 +1,5 @@
+graph aws {
+	liferay1 [image="amazon_ec2.png"]
+	liferay2 [image="amazon_ec2.png"]
+	liferay1 -- liferay2
+}
