@@ -1,5 +1,54 @@
 graph aws {
-	liferay1 [image="amazon_ec2.png"]
-	liferay2 [image="amazon_ec2.png"]
-	liferay1 -- liferay2
+	shape="box"
+	newrank=true
+	compound=true
+	subgraph cluster_vpc_produccion {
+		label="VPC PRODUCCION"
+		elb_externo [image="elb.png" shape="box" labelloc="b"]
+		UTM_1 [image="ec2.png" shape="box" labelloc="b"]
+		UTM_2 [image="ec2.png" shape="box" labelloc="b"]
+		elb_interno [image="elb.png" shape="box" labelloc="b"]
+		subgraph cluster_liferays_produccion {
+			label=""
+			rank="same"
+			liferay_produccion_1 [image="ec2.png" shape="box" labelloc="b"]
+			liferay_produccion_2 [image="ec2.png" shape="box" labelloc="b"]
+			liferay_produccion_3 [image="ec2.png" shape="box" labelloc="b"]
+			liferay_produccion_4 [image="ec2.png" shape="box" labelloc="b"]
+			liferay_produccion_1 -- liferay_produccion_2
+			liferay_produccion_2 -- liferay_produccion_3
+			liferay_produccion_3 -- liferay_produccion_4
+		}	
+		rds_produccion [image="rds.png" shape="box" labelloc="b"]
+		elb_externo -- UTM_1
+		elb_externo -- UTM_2
+		UTM_1 -- elb_interno
+		UTM_2 -- elb_interno
+		elb_interno -- liferay_produccion_1 [lhead="cluster_liferays_produccion"]
+		liferay_produccion_1 --rds_produccion [ltail="cluster_liferays_produccion"]
+	}
+	subgraph cluster_vpc_pre_produccion {
+		label="VPC PRE PRODUCCION"
+		subgraph cluster_liferays_pre_produccion {
+			label=""
+			rank="same"
+			liferay_pre_produccion_1 [image="ec2.png" shape="box" labelloc="b"]
+			liferay_pre_produccion_2 [image="ec2.png" shape="box" labelloc="b"]
+			liferay_pre_produccion_1 -- liferay_pre_produccion_2 [rankdir="LR"]
+		}
+		rds_pre_produccion [image="rds.png" shape="box" labelloc="b"]
+		liferay_pre_produccion_1 -- rds_pre_produccion [ltail="cluster_liferays_pre_produccion"]
+	}
+	subgraph cluster_vpc_qa {
+		label="VPC QA"
+		liferay_qa_1 [image="ec2.png" shape="box" labelloc="b"]
+		rds_qa [image="rds.png" shape="box" labelloc="b"]
+		liferay_qa_1 -- rds_qa
+	}
+	subgraph cluster_vpc_dev {
+		label="VPC DEV"
+		liferay_dev_1 [image="ec2.png" shape="box" labelloc="b"]
+		rds_dev [image="rds.png" shape="box" labelloc="b"]
+		liferay_dev_1 -- rds_dev
+	}
 }
