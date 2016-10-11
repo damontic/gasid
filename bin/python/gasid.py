@@ -20,9 +20,6 @@ NODE_ATTRIBUTES = {"image":'icons/ec2_instance.png', "peripheries":"0", "shape":
 
 ERROR_NO_INSTANCE_NAME_TAG = "Instance has no InstanceName tag"
 
-def hello():
-        print("hello")
-
 class Gasid(object):
         """
         Creates an infraestructure image from an Amazon Web Service account.
@@ -36,11 +33,11 @@ class Gasid(object):
                         os.mkdir(DIRECTORY_PICKLES)
 
                 connection = boto.connect_ec2()
-                instances = self.get_instances(connection)
+                instances = self.__get_instances(connection)
 
-                return self.create_image(file_dot = self.create_dot_file(instances))
+                return self.__create_image(file_dot = self.__create_dot_file(instances))
 
-        def get_instances(self, connection):
+        def __get_instances(self, connection):
                 """
                 Returns the instances from AWS and stores them in the pickles directory.
                 If the pickles directory and the FILE_INSTANCES file already exist then
@@ -51,17 +48,29 @@ class Gasid(object):
                 """
 
                 if not os.path.isfile(FULL_FILE_INSTANCES_PATH):
-                        file_instances = open(FULL_FILE_INSTANCES_PATH, FILE_WRITE_BYTES)
                         instances = connection.get_only_instances()
-                        pickle.dump(instances, file_instances)
+                        self.__write_instances_file(instances)
                 else:
-                        file_instances = open(FULL_FILE_INSTANCES_PATH, FILE_READ_BYTES)
-                        instances = pickle.load(file_instances)
-                file_instances.close()
+                        instances = self.__read_instances_file()
 
                 return instances
 
-        def create_dot_file(self, instances):
+        def __read_instances_file(self):
+                file_instances = open(FULL_FILE_INSTANCES_PATH, FILE_READ_BYTES)
+                try:
+                        instances = pickle.load(file_instances)
+                finally:
+                        file_instances.close()
+                return instances
+
+        def __write_instances_file(self, instances):
+                file_instances = open(FULL_FILE_INSTANCES_PATH, FILE_WRITE_BYTES)
+                try:
+                        pickle.dump(instances, file_instances)
+                finally:
+                        file_instances.close()
+
+        def __create_dot_file(self, instances):
                 graph = graphviz.Graph("Principal")
                 graph1 = graphviz.Graph()
                 graph2 = graphviz.Graph()
@@ -91,8 +100,8 @@ class Gasid(object):
 
                 return FULL_FILE_RESULT_PATH
 
-        def create_image(self, engine = ENGINE_FDP, format = IMAGE_FORMAT_PNG, file_dot = None):
+        def __create_image(self, engine = ENGINE_FDP, format = IMAGE_FORMAT_PNG, file_dot = None):
                 graphviz.render(engine, format, file_dot)
 
-        def eprint(*args, **kwargs):
+        def __eprint(*args, **kwargs):
                 print(*args, file=sys.stderr, **kwargs)
